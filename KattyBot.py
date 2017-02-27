@@ -20,7 +20,25 @@ SpamID = 163078549  # Marco: 163078549
 updater = Updater(token='362591666:AAEwquW77vwbnwDhK2899SGUoW4emmKoLQk')
 
 dispatcher = updater.dispatcher
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+# logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+"""Definizione di alcuni filtri base che bloccano le azioni del bot."""
+class FilterSpam(BaseFilter):
+    """Filtro da usare per limitare ad un gruppo l'uso del bot."""
+    def filter(self, message):
+        """Controlla che l'ID della chat sia uguale a quello dello Spam."""
+        return SpamID == message.chat_id
+
+
+class FilterOnOff(BaseFilter):
+    """Filtro da usare per limitare ad un gruppo l'uso del bot."""
+    def filter(self, message):
+        """Controlla che l'ID della chat sia uguale a quello dello Spam."""
+        return flag_Chat is True
+
+
+filter_spam = FilterSpam()
+filter_OnOff = FilterOnOff()
 
 
 def start(bot, update):
@@ -43,45 +61,39 @@ dispatcher.add_handler(start_handler)
 dispatcher.add_handler(stop_handler)
 
 
+""" ----------- COMANDO BATMAN --------------"""
 def batman(bot, update):
     """La funzione callback che viene chiamata dalla parola chiave batman."""
-    # TODO: scoprire come usare la caption del comando sendPhoto
-    if flag_Chat is True:
-        bot.sendPhoto(chat_id=update.message.chat_id, photo='https://selfie.legobatman.com/assets/img/BatmanLegalScreen.png', caption='NANANANA')
+    bot.sendPhoto(chat_id=update.message.chat_id, photo='https://selfie.legobatman.com/assets/img/BatmanLegalScreen.png', caption='NANANANA')
 
 
 class FilterBatman(BaseFilter):
     """Questa parte si occupa di verificare la presenza della parola chiave "batman" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback batman."""
     def filter(self, message):
+        """Ritorna True se la parola batman è presente nel testo del messaggio."""
         return 'batman' in message.text
 
 
-class FilterSpam(BaseFilter):
-    """Questa parte si occupa di verificare la presenza della parola chiave "batman" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback batman."""
-    def filter(self, message):
-        """Controlla che l'ID della chat sia uguale a quello dello Spam."""
-        return SpamID == message.chat_id
-
-
 filter_batman = FilterBatman()
-filter_spam = FilterSpam()
 
-batman_handler = MessageHandler(filter_batman & filter_spam, batman)
+batman_handler = MessageHandler(filter_batman & filter_spam & filter_OnOff, batman)
 dispatcher.add_handler(batman_handler, group=0)
 
 
+""" ----------- COMANDO ECO --------------"""
 def echo(bot, update):
     """Semplice comando: ogni volta che sniffa un messaggio, risponde con una frase."""
-    if flag_Chat is True:
-        bot.sendMessage(chat_id=update.message.chat_id, text='Ogni volta che scrivi qualcosa io rispondo così.')
+    bot.sendMessage(chat_id=update.message.chat_id, text='Ogni volta che scrivi qualcosa io rispondo così.')
 
 
-echo_handler = MessageHandler(Filters.text, echo)
+echo_handler = MessageHandler(Filters.text & filter_spam & filter_OnOff, echo)
 dispatcher.add_handler(echo_handler, group=0)
 
+
+""" ----------- COMANDO CHAT ID --------------"""
 def chatID(bot, update):
-    """"Questo è handler vuoto che uso solo per capire l'ID della chat,
-    quando qualcuno scrive il comando /chat_id"""
+    """Questo è handler vuoto che uso solo per capire l'ID della chat,
+    quando qualcuno scrive il comando /chat_id."""
     global IDchat
     user = update.message.from_user
     IDchat = update.message.chat.id
@@ -91,6 +103,7 @@ def chatID(bot, update):
 
 chatID_handler = CommandHandler('chatID', chatID)
 dispatcher.add_handler(chatID_handler)
+
 
 updater.start_polling(clean=True)
 
