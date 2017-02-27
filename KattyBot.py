@@ -7,8 +7,9 @@
 # Token: 362591666:AAEwquW77vwbnwDhK2899SGUoW4emmKoLQk.
 """
 
-import logging
+# import logging
 import random
+import os
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
@@ -41,7 +42,7 @@ class FilterOnOff(BaseFilter):
 filter_spam = FilterSpam()
 filter_OnOff = FilterOnOff()
 
-
+# TODO: creare un dizionario con coppia "chat ID" e "stato flag_Chat" e poi modificare il relativo filtro in modo che guardi lo stato della specifica chat.
 def start(bot, update):
     """Funzione chiamata da /start@KattyBot. Penso sia necessario chiamarla una volta. Oltre a scrivere un saluto, imposta anche il flag su True e questo viene usato per abilitare il resto delle conversazioni."""
     global flag_Chat
@@ -109,13 +110,16 @@ dispatcher.add_handler(batman_handler, group=0)
 """ ----------- COMANDO FILE LOCALE --------------"""
 def foto(bot, update):
     """La funzione callback che viene chiamata dalla parola chiave batman."""
-    bot.sendPhoto(update.message.chat_id, open('prova.png', 'rb'))
+    lista_imm = os.listdir("immagini")
+    n_imm = random.randint(0, len(lista_imm) - 1)
+    bot.sendPhoto(update.message.chat_id, open("immagini/" + lista_imm[n_imm], 'rb'))
 
 class FilterFoto(BaseFilter):
     """Questa parte si occupa di verificare la presenza della parola chiave "batman" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback batman."""
     def filter(self, message):
         """Ritorna True se la parola batman è presente nel testo del messaggio."""
         return 'foto locale' in message.text.lower()
+        # TODO: cercare di rendere più di una le stringhe che attivato il callback
 
 
 filter_foto = FilterFoto()
@@ -132,7 +136,7 @@ def echo(bot, update):
 echo_handler = MessageHandler(Filters.text & filter_spam & filter_OnOff, echo)
 # dispatcher.add_handler(echo_handler, group=0)
 
-
+# TODO: cercare come impostare un tempo limite oltre il quale non ripescare post
 updater.start_polling(clean=True)
 
 # Per terminare il bot: updater.stop()
