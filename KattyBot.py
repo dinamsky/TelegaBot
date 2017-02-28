@@ -19,6 +19,9 @@ flag_Chat = True
 IDchat = 0
 SpamID = {-2861403, 163078549}  # Netflix: -2861403  Marco: 163078549
 
+listaBatman = ['batman', 'robin', 'dc', 'nananana']
+listaKatty = ['katty', 'gnocca', 'figa']
+
 updater = Updater(token='362591666:AAEwquW77vwbnwDhK2899SGUoW4emmKoLQk')
 
 dispatcher = updater.dispatcher
@@ -99,13 +102,40 @@ class FilterBatman(BaseFilter):
     """Questa parte si occupa di verificare la presenza della parola chiave "batman" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback batman."""
     def filter(self, message):
         """Ritorna True se la parola batman è presente nel testo del messaggio."""
-        return 'batman' in message.text.lower()
+        return any(parola in message.text.lower() for parola in listaBatman)
 
 
 filter_batman = FilterBatman()
 
 batman_handler = MessageHandler(filter_batman & filter_spam & filter_OnOff, batman)
 dispatcher.add_handler(batman_handler, group=0)
+
+""" ----------- COMANDO Katty --------------"""
+def katty(bot, update):
+    """La funzione callback che viene chiamata dalla parola chiave katty."""
+    kattyDB = open('kattyDB.txt', 'r')
+    linee = 0
+    for line in kattyDB:
+        linee = linee + 1
+    kattyDB.seek(0)    # Per tornare ad inizio file.
+    n_linea = random.randint(0, linee - 1)
+    estratto = kattyDB.readlines()[n_linea]
+    kattyDB.close()
+    bot.sendPhoto(chat_id=update.message.chat_id, photo=estratto)
+    # bot.sendPhoto(chat_id=update.message.chat_id, photo=estratto)
+
+
+class FilterKatty(BaseFilter):
+    """Questa parte si occupa di verificare la presenza della parola chiave "katty" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback batman."""
+    def filter(self, message):
+        """Ritorna True se la parola katty è presente nel testo del messaggio."""
+        return any(parola in message.text.lower() for parola in listaKatty)
+
+
+filter_katty = FilterKatty()
+
+katty_handler = MessageHandler(filter_katty & filter_spam & filter_OnOff, katty)
+dispatcher.add_handler(katty_handler, group=0)
 
 """ ----------- COMANDO FILE LOCALE --------------"""
 def foto(bot, update):
@@ -119,7 +149,6 @@ class FilterFoto(BaseFilter):
     def filter(self, message):
         """Ritorna True se la parola batman è presente nel testo del messaggio."""
         return 'foto locale' in message.text.lower()
-        # TODO: cercare di rendere più di una le stringhe che attivato il callback
 
 
 filter_foto = FilterFoto()
