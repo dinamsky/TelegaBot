@@ -10,15 +10,15 @@
 
 # import logging
 import random
-import os
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
-from telegram.ext import MessageHandler, Filters
+from telegram.ext import MessageHandler # , Filters
 from telegram.ext import BaseFilter
 
 flag_Chat = True
 IDchat = 0
 SpamID = {-2861403, 163078549}  # Netflix: -2861403  Marco: 163078549
+ChatID = {-2861403: True, 163078549: True}
 
 listaKatty = ['katty', 'gnocca', 'figa']
 listaAddio = ['lascio', 'addio', 'vomito', 'schifo']
@@ -37,28 +37,28 @@ class FilterSpam(BaseFilter):
 
 
 class FilterOnOff(BaseFilter):
-    """Filtro da usare per limitare ad un gruppo l'uso del bot."""
+    """Filtro da usare per non abilitare la conversazione del bot."""
     def filter(self, message):
         """Controlla che l'ID della chat sia uguale a quello dello Spam."""
-        return flag_Chat is True
+        return ChatID[message.chat_id]
 
 
 filter_spam = FilterSpam()
 filter_OnOff = FilterOnOff()
 
-# TODO: creare un dizionario con coppia "chat ID" e "stato flag_Chat" e poi modificare il relativo filtro in modo che guardi lo stato della specifica chat.
 def start(bot, update):
     """Funzione chiamata da /start@KattyBot. Penso sia necessario chiamarla una volta. Oltre a scrivere un saluto, imposta anche il flag su True e questo viene usato per abilitare il resto delle conversazioni."""
-    global flag_Chat
+    global ChatID
     bot.sendMessage(chat_id=update.message.chat_id, text="Ciao a tutti! KAFFFEEH?")
-    flag_Chat = True
+    # if not(update.message.chat_id in ChatID.keys()):
+    ChatID[update.message.chat_id] = True
 
 
 def stop(bot, update):
     """"Funzione chiamata da /stop@KattyBot. Oltre a scrivere un addio, imposta anche il flag su False."""
-    global flag_Chat
+    global ChatID
     bot.sendMessage(chat_id=update.message.chat_id, text="Me ne vado. Ma prima voglio dire una cosa: A Beppe piace la Kattyyyy")
-    flag_Chat = False
+    ChatID[update.message.chat_id] = False
 
 
 start_handler = CommandHandler('start', start)
