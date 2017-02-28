@@ -1,4 +1,6 @@
 """ ----------- COMANDO BATMAN --------------"""
+listaBatman = ['batman', 'robin', 'dc', 'nananana']
+
 def batman(bot, update):
     """La funzione callback che viene chiamata dalla parola chiave batman."""
     batmanDB = open('batmanDB.txt', 'r')

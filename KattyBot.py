@@ -6,6 +6,7 @@
 # Username: @KattyBot
 # Token: 362591666:AAEwquW77vwbnwDhK2899SGUoW4emmKoLQk.
 """
+# TODO: comando buonanotte il sabato sera
 
 # import logging
 import random
@@ -19,8 +20,8 @@ flag_Chat = True
 IDchat = 0
 SpamID = {-2861403, 163078549}  # Netflix: -2861403  Marco: 163078549
 
-listaBatman = ['batman', 'robin', 'dc', 'nananana']
 listaKatty = ['katty', 'gnocca', 'figa']
+listaAddio = ['lascio', 'addio', 'vomito', 'schifo']
 
 updater = Updater(token='362591666:AAEwquW77vwbnwDhK2899SGUoW4emmKoLQk')
 
@@ -80,36 +81,6 @@ chatID_handler = CommandHandler('chatID', chatID)
 dispatcher.add_handler(chatID_handler)
 
 
-""" ----------- COMANDO BATMAN --------------"""
-def batman(bot, update):
-    """La funzione callback che viene chiamata dalla parola chiave batman."""
-    batmanDB = open('batmanDB.txt', 'r')
-    linee = 0
-    for line in batmanDB:
-        linee = linee + 1
-    batmanDB.seek(0)    # Per tornare ad inizio file.
-
-    n_linea = random.randint(0, linee - 1)
-    estratto = batmanDB.readlines()[n_linea].split(',')
-    link = estratto[0]
-    didascalia = estratto[1]
-    batmanDB.close()
-
-    bot.sendPhoto(chat_id=update.message.chat_id, photo=link, caption=didascalia)
-
-
-class FilterBatman(BaseFilter):
-    """Questa parte si occupa di verificare la presenza della parola chiave "batman" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback batman."""
-    def filter(self, message):
-        """Ritorna True se la parola batman è presente nel testo del messaggio."""
-        return any(parola in message.text.lower() for parola in listaBatman)
-
-
-filter_batman = FilterBatman()
-
-batman_handler = MessageHandler(filter_batman & filter_spam & filter_OnOff, batman)
-dispatcher.add_handler(batman_handler, group=0)
-
 """ ----------- COMANDO Katty --------------"""
 def katty(bot, update):
     """La funzione callback che viene chiamata dalla parola chiave katty."""
@@ -126,7 +97,7 @@ def katty(bot, update):
 
 
 class FilterKatty(BaseFilter):
-    """Questa parte si occupa di verificare la presenza della parola chiave "katty" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback batman."""
+    """Questa parte si occupa di verificare la presenza della parola chiave "katty" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback katty."""
     def filter(self, message):
         """Ritorna True se la parola katty è presente nel testo del messaggio."""
         return any(parola in message.text.lower() for parola in listaKatty)
@@ -137,33 +108,26 @@ filter_katty = FilterKatty()
 katty_handler = MessageHandler(filter_katty & filter_spam & filter_OnOff, katty)
 dispatcher.add_handler(katty_handler, group=0)
 
-""" ----------- COMANDO FILE LOCALE --------------"""
-def foto(bot, update):
-    """La funzione callback che viene chiamata dalla parola chiave batman."""
-    lista_imm = os.listdir("immagini")
-    n_imm = random.randint(0, len(lista_imm) - 1)
-    bot.sendPhoto(update.message.chat_id, open("immagini/" + lista_imm[n_imm], 'rb'))
+""" ----------- COMANDO ADDIO --------------"""
+def addio(bot, update):
+    """La funzione callback che viene chiamata dalla parola chiave addio e simili."""
+    user = update.message.from_user
+    bot.sendMessage(chat_id=update.message.chat_id, text='Non dire così. Io ti AMO, {}!! {}'.format(user['first_name'], u'\U0001F60D'))
 
-class FilterFoto(BaseFilter):
-    """Questa parte si occupa di verificare la presenza della parola chiave "batman" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback batman."""
+
+# TODO: sarebbe bello impostarlo in modo che funzioni solo dopo entro un certo tempo da quando ha mandato la foto.
+class FilterAddio(BaseFilter):
+    """Questa parte si occupa di verificare la presenza della parola chiave "addio" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback addio."""
     def filter(self, message):
-        """Ritorna True se la parola batman è presente nel testo del messaggio."""
-        return 'foto locale' in message.text.lower()
+        """Ritorna True se la parola addio è presente nel testo del messaggio."""
+        return any(parola in message.text.lower() for parola in listaAddio)
 
 
-filter_foto = FilterFoto()
+filter_addio = FilterAddio()
 
-foto_handler = MessageHandler(filter_foto & filter_spam & filter_OnOff, foto)
-dispatcher.add_handler(foto_handler, group=0)
+addio_handler = MessageHandler(filter_addio & filter_spam & filter_OnOff, addio)
+dispatcher.add_handler(addio_handler, group=0)
 
-""" ----------- COMANDO ECO --------------"""
-def echo(bot, update):
-    """Semplice comando: ogni volta che sniffa un messaggio, risponde con una frase."""
-    bot.sendMessage(chat_id=update.message.chat_id, text='Ogni volta che scrivi qualcosa io rispondo così.')
-
-
-echo_handler = MessageHandler(Filters.text & filter_spam & filter_OnOff, echo)
-# dispatcher.add_handler(echo_handler, group=0)
 
 # TODO: cercare come impostare un tempo limite oltre il quale non ripescare post
 updater.start_polling(clean=True)
