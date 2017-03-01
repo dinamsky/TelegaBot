@@ -25,7 +25,7 @@ ChatID = {-2861403: True, 163078549: True}
 
 listaKatty = ['katty', 'ketty', 'gnocca', 'figa',
               'cagna', 'tette', 'mozzarellona', 'culo', 'porca']
-listaAddio = ['lascio', 'addio', 'vomito', 'schifo']
+listaAddio = ['lascio', 'addio', 'vomito', 'schifo', 'oddio']
 
 # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
@@ -100,13 +100,23 @@ class FilterKatty(BaseFilter):
 
 def addio(bot, update):
     """La funzione callback che viene chiamata dalla parola chiave addio e simili."""
+    addioDB = open('addioDB.txt', 'r', encoding='utf-8')
+
+    linee = 0
+    for line in addioDB:
+        linee = linee + 1
+    addioDB.seek(0)    # Per tornare ad inizio file.
+
+    n_linea = random.randint(0, linee - 1)
+    estratto = addioDB.readlines()[n_linea]
+    addioDB.close()
+
     user = update.message.from_user
-    bot.sendMessage(chat_id=update.message.chat_id, text='Non dire così. Io ti AMO, {}!! {}'.format(
-        user['first_name'], u'\U0001F60D'))
+    frase = estratto.format(user['first_name'], u'\U0001F60D')
+    bot.sendMessage(chat_id=update.message.chat_id, text=frase)
+    # 'Non dire così. Io ti AMO, {}!! {}'.format(user['first_name'], u'\U0001F60D'
 
 
-# TODO: sarebbe bello impostarlo in modo che funzioni solo dopo entro un
-# certo tempo da quando ha mandato la foto.
 class FilterAddio(BaseFilter):
     """Questa parte si occupa di verificare la presenza della parola chiave "addio" nel testo del messaggio. Se è presente, ritorna 1 e quindi viene chiamata la funzione di callback addio."""
 
