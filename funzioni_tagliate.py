@@ -1,3 +1,5 @@
+import os
+
 """ ----------- COMANDO BATMAN --------------"""
 listaBatman = ['batman', 'robin', 'dc', 'nananana']
 
